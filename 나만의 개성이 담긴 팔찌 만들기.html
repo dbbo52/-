@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실에 구슬 끼우기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        #bead-selection {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .bead {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #bracelet-container {
+            margin: 0 auto;
+            width: 400px;
+            height: 400px;
+            position: relative;
+        }
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .bracelet-bead {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #undo-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="bead-selection">
+        <div class="bead" style="background-color: red;" onclick="addBead('red')"></div>
+        <div class="bead" style="background-color: orange;" onclick="addBead('orange')"></div>
+        <div class="bead" style="background-color: yellow;" onclick="addBead('yellow')"></div>
+        <div class="bead" style="background-color: green;" onclick="addBead('green')"></div>
+        <div class="bead" style="background-color: blue;" onclick="addBead('blue')"></div>
+        <div class="bead" style="background-color: purple;" onclick="addBead('purple')"></div>
+        <div class="bead" style="background-color: pink;" onclick="addBead('pink')"></div>
+    </div>
+
+    <div id="bracelet-container">
+        <svg width="400" height="400">
+            <!-- 실의 경로를 그립니다 -->
+            <path id="bracelet-path" d="M 200,200 m -150,0 a 150,150 0 1,1 300,0 a 150,150 0 1,1 -300,0" stroke="black" fill="transparent"/>
+        </svg>
+    </div>
+
+    <button id="undo-button" onclick="undoBead()">뒤로가기</button>
+
+    <script>
+        let beadCount = 0;
+        const beadElements = [];
+
+        function addBead(color) {
+            const maxBeads = 24; // 팔찌에 끼울 수 있는 최대 구슬 수
+            if (beadCount >= maxBeads) {
+                alert('팔찌에 더 이상 구슬을 추가할 수 없습니다.');
+                return;
+            }
+
+            const path = document.getElementById('bracelet-path');
+            const pathLength = path.getTotalLength(); // 실의 경로 길이
+
+            // 구슬이 시작부터 중앙에 생기지 않도록 구슬 위치 계산 조정
+            const adjustedBeadCount = beadCount + 1; // 시작 위치 조정
+            const position = (adjustedBeadCount / (maxBeads + 1)) * pathLength; // 경로상의 위치 계산
+            const point = path.getPointAtLength(position); // 구슬의 위치 포인트
+
+            const bead = document.createElement('div');
+            bead.className = 'bracelet-bead';
+            bead.style.backgroundColor = color;
+            bead.style.left = `${point.x}px`;
+            bead.style.top = `${point.y}px`;
+
+            document.getElementById('bracelet-container').appendChild(bead);
+            beadElements.push(bead);
+            beadCount++;
+        }
+
+        function undoBead() {
+            if (beadCount > 0) {
+                const lastBead = beadElements.pop(); // 마지막 구슬을 배열에서 제거
+                lastBead.remove(); // 마지막 구슬을 DOM에서 제거
+                beadCount--;
+            } else {
+                alert('제거할 구슬이 없습니다.');
+            }
+        }
+    </script>
+</body>
+</html>
